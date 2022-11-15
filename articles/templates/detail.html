@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid grid-cols-2 min-h-full">
+    <div class="flex flex-col justify-between min-h-full px-16">
+        <div class="flex flex-col mt-16">
+            <span class="mb-2 text-stone-500 italic">
+                {{article.user}}
+            </span>
+            <input class="text-4xl font-bold mb-10" type="text" value="{{article.title}}" readonly
+                onfocus="this.blur()">
+            <textarea class="text-lg" id="textarea" onfocus="this.blur()" readonly>{{article.content}} </textarea>
+        </div>
+        <input type="hidden" name="lat" id="lat-input" value="37.509687">
+        <input type="hidden" name="lng" id="lng-input" value="127.065778">
+        <input type="hidden" name="pitch" id="pitch-input" value="10">
+        <input type="hidden" name="heading" id="heading-input" value="34">
+        <div class="flex justify-between space-x-4 my-8">
+            <a href="{% url 'index' %}" class="hover:bg-gray-200 text-black px-3 py-2 text-lg">
+                <i class="fa-solid fa-left-long"></i> 나가기
+            </a>
+            {% if request.user == article.user %}
+            <a href="{% url 'delete' article.pk %}" class="hover:bg-red-400 text-black px-3 py-2 text-lg">
+                삭제하기
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="min-w-50 max-w-50">
+        <div id="map"></div>
+        <div id="pano"></div>
+    </div>
+</div>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB80mDoyVPOSFVHx7gWGifGKP5A7-XLIks&callback=initialize&v=weekly"
+    defer>
+    </script>
+
+{% endblock %}
+
+{% block css %}
+<style>
+    textarea {
+        height: 50vh;
+        resize: none;
+    }
+
+    input:focus,
+    textarea:focus {
+        outline: none;
+    }
+
+    #map,
+    #pano {
+        height: 50%;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+{% block js%}
+
+<script>
+    document.querySelector('nav').style.display = 'none';
+    let lat = Number("{{ article.lat }}")
+    let lng = Number("{{ article.lng }}")
+    let pitch = Number("{{ article.pitch }}")
+    let heading = Number("{{ article.heading }}")
+
+    function initialize() {
+        const fenway = { lat: lat, lng: lng };
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: fenway,
+            zoom: 14,
+        });
+        let panorama = new google.maps.StreetViewPanorama(
+            document.getElementById("pano"),
+            {
+                position: fenway,
+                pov: {
+                    heading: heading,
+                    pitch: pitch,
+                },
+            }
+        );
+        map.setStreetView(panorama);
+    }
+    window.initialize = initialize;
+
+</script>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hypergrowth</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+  <script src="https://kit.fontawesome.com/e35559fcee.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <nav class="bg-white">
+    <div class="mx-auto max-w-7xl px-8">
+      <div class="relative flex h-16 items-center justify-between">
+        <div class="flex space-x-4 items-end">
+          <a href="{% url 'index' %}" aria-current="page">
+            <img class="block h-8 w-auto" src="{% static 'logo.png' %}">
+          </a>
+          {% if request.user.is_authenticated %}
+          <span class="text-stone-500 text-sm">안녕하세요. {{request.user}}님</span>
+          {% endif %}
+        </div>
+        <div class="flex space-x-4 create-btn">
+          <a id="index" href="{% url 'index' %}" class="bg-white hover:bg-emerald-400 text-black px-3 py-2 text-md">
+            거리보기
+          </a>
+          <a id="create" href="{% url 'create' %}" class="bg-white hover:bg-emerald-400 text-black px-3 py-2 text-md">
+            공유하기
+          </a>
+          {% if not request.user.is_authenticated %}
+          <a id='login' href="{% url 'login' %}" class="bg-white hover:bg-emerald-400 text-black px-3 py-2 text-md">
+            로그인
+          </a>
+          {% else %}
+          <a href="{% url 'logout' %}" class="bg-white hover:bg-emerald-400 text-black px-3 py-2 text-md">
+            로그아웃
+          </a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </nav>
+  <div class="absolute inset-x-0 top-8">
+    {% for message in messages %}
+    <div class="mx-auto p-4 mb-2 text-xs text-red-700 bg-red-100 rounded-lg max-w-2xl" role="alert">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% block content %}
+  {% endblock content %}
+
+  {% block js %}
+  {% endblock %}
+</body>
+{% block css %}
+{% endblock %}
+<style>
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .bg-hyper-green {
+    background-color: #03ADAA
+  }
+
+  .bg-hyper-red {
+    background-color: #F92919
+  }
+
+  .color-hyper {
+    color: #03ADAA
+  }
+
+  .active {
+    background-color: rgb(52 211 153);
+    color: white;
+  }
+</style>
+
+</html>

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid grid-cols-2 min-h-full">
+    <form method="post" id="create-form">
+        <input type="text" style="display: none;" />
+        <div class="flex flex-col justify-between min-h-full px-16">
+            {% csrf_token %}
+            <div class="flex flex-col py-16">
+                <input class="text-3xl font-bold mb-10" type="text" name="title" placeholder="제목을 입력하세요" maxlength="30"
+                    required>
+                <textarea class="text-lg" id="textarea" name="content" placeholder="내용을 입력하세요" required></textarea>
+            </div>
+            <input type="hidden" name="lat" id="lat-input" value="37.509687">
+            <input type="hidden" name="lng" id="lng-input" value="127.065778">
+            <input type="hidden" name="pitch" id="pitch-input" value="10">
+            <input type="hidden" name="heading" id="heading-input" value="34">
+            <div class="flex justify-between space-x-4 my-8">
+                <a href="{% url 'index' %}" class="hover:bg-gray-200 text-black px-3 py-2 text-lg">
+                    <i class="fa-solid fa-left-long"></i> 나가기
+                </a>
+                <input type="submit" href="{% url 'create' %}"
+                    class="cursor-pointer hover:bg-emerald-600 bg-emerald-500 text-white px-3 py-2 text-lg"
+                    value="공유하기">
+            </div>
+        </div>
+    </form>
+    <div class="min-w-50 max-w-50">
+        <div id="map"></div>
+        <div id="pano"></div>
+    </div>
+</div>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB80mDoyVPOSFVHx7gWGifGKP5A7-XLIks&callback=initialize&v=weekly"
+    defer>
+    </script>
+
+{% endblock %}
+
+{% block css %}
+<style>
+    textarea {
+        height: 50vh;
+        resize: none;
+    }
+
+    input:focus,
+    textarea:focus {
+        outline: none;
+    }
+
+    #map,
+    #pano {
+        height: 50%;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+{% block js%}
+<script>
+    document.querySelector("#create").classList.add('active')
+</script>
+
+<script>
+    document.querySelector('nav').style.display = 'none';
+    const createForm = document.querySelector('#create-form')
+    const latInput = document.querySelector('#lat-input')
+    const lngInput = document.querySelector('#lng-input')
+    const pitchInput = document.querySelector('#pitch-input')
+    const headingInput = document.querySelector('#heading-input')
+
+
+    let lat = Number(latInput.value)
+    let lng = Number(lngInput.value)
+    let heading = Number(headingInput.value)
+    let pitch = Number(pitchInput.value)
+
+    function initialize() {
+
+        const fenway = { lat: lat, lng: lng };
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: fenway,
+            zoom: 14,
+        });
+        let panorama = new google.maps.StreetViewPanorama(
+            document.getElementById("pano"),
+            {
+                position: fenway,
+                pov: {
+                    heading: 34,
+                    pitch: 10,
+                },
+            }
+        );
+        map.setStreetView(panorama);
+
+        map.addListener('click', (event) => {
+
+            lat = event.latLng.toJSON().lat
+            lng = event.latLng.toJSON().lng
+            heading = 34
+            pitch = 10
+
+            latInput.value = lat
+            lngInput.value = lng
+            pitchInput.value = pitch
+            headingInput.value = heading
+
+            panorama = new google.maps.StreetViewPanorama(
+                document.getElementById("pano"),
+                {
+                    position: event.latLng.toJSON(),
+                    panControl: true,
+                    pov: {
+                        heading: heading,
+                        pitch: pitch,
+                    },
+                }
+            );
+            map.setStreetView(panorama);
+        })
+
+        panorama.addListener('pov_changed', (event) => {
+            heading = panorama.getPov().heading
+            pitch = panorama.getPov().pitch
+            pitchInput.value = pitch
+            headingInput.value = heading
+        })
+    }
+    window.initialize = initialize;
+
+</script>
+{% endblock %}

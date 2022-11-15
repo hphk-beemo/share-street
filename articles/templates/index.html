@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="bg-white">
+    <div class="mx-auto max-w-7xl py-8 px-4 ">
+        <div class="mt-6 grid grid-cols-3 gap-y-10 gap-x-12">
+            {% for article in articles %}
+            <a href="{% url 'detail' article.pk %}" class="group">
+                <div
+                    class="min-h-80 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75">
+                    <img src="{{article.thumbnail.url}}"
+                        class="h-full w-full object-cover object-center lg:h-full lg:w-full">
+                </div>
+                <div class="flex justify-end px-2 py-1 shadow">
+                    <span class="text-stone-500 italic">
+                        {{article.user}}
+                    </span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block js %}
+<script>
+    document.querySelector("#index").classList.add('active')
+</script>
+{% endblock %}
